@@ -79,13 +79,15 @@ export const handler: Handler = async (event) => {
 			statusCode: 200,
 			body: JSON.stringify({ rate }),
 		};
-	} catch (error: any) {
+	} catch (error) {
 		console.error(`Error fetching ${path}:`, error);
-		console.error("Error details:", {
-			name: error.name,
-			message: error.message,
-			stack: error.stack,
-		});
+		if (error instanceof Error) {
+			console.error("Error details:", {
+				name: error.name,
+				message: error.message,
+				stack: error.stack,
+			});
+		}
 		return {
 			statusCode: 200,
 			body: JSON.stringify({ rate: 0 }),

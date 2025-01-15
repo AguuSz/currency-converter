@@ -23,13 +23,15 @@ export async function GET() {
 		console.log("Cleaned ARS Tarjeta value:", cleanValue);
 
 		return NextResponse.json({ rate: cleanValue });
-	} catch (error: any) {
+	} catch (error) {
 		console.error("Error fetching ARS Tarjeta rate:", error);
-		console.error("Error details:", {
-			name: error.name,
-			message: error.message,
-			stack: error.stack,
-		});
+		if (error instanceof Error) {
+			console.error("Error details:", {
+				name: error.name,
+				message: error.message,
+				stack: error.stack,
+			});
+		}
 		return NextResponse.json({ rate: 0 });
 	}
 }
