@@ -1,8 +1,10 @@
-import { chromium } from "playwright";
+import { chromium } from "playwright-core";
 import { NextResponse } from "next/server";
 
 export async function GET() {
-	const browser = await chromium.launch();
+	const browser = await chromium.launch({
+		args: ["--no-sandbox", "--disable-setuid-sandbox"],
+	});
 	const page = await browser.newPage();
 
 	try {
