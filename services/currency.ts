@@ -5,6 +5,11 @@ import {
 	CacheData,
 } from "./cache";
 
+const API_BASE =
+	process.env.NEXT_PUBLIC_RUNTIME_ENV === "netlify"
+		? "/.netlify/functions/api"
+		: "/api";
+
 export async function getARSRate() {
 	const CACHE_KEY = "ars_rate";
 	const cached = getCachedValue(CACHE_KEY) as CacheData | null;
@@ -14,7 +19,7 @@ export async function getARSRate() {
 	}
 
 	try {
-		const response = await fetch("/api/ars-rate");
+		const response = await fetch(`${API_BASE}/ars-rate`);
 		const data = await response.json();
 		const timestamp = Date.now();
 		setCachedValue(CACHE_KEY, data.rate, timestamp);
@@ -37,7 +42,7 @@ export async function getUSDRate() {
 	}
 
 	try {
-		const response = await fetch("/api/usd-rate");
+		const response = await fetch(`${API_BASE}/usd-rate`);
 		const data = await response.json();
 		setCachedValue(CACHE_KEY, data.rate);
 		return data.rate;
@@ -56,7 +61,7 @@ export async function getARSTarjetaRate() {
 	}
 
 	try {
-		const response = await fetch("/api/ars-tarjeta-rate");
+		const response = await fetch(`${API_BASE}/ars-tarjeta-rate`);
 		const data = await response.json();
 		setCachedValue(CACHE_KEY, data.rate);
 		return data.rate;
