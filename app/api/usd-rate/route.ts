@@ -1,31 +1,21 @@
-import { chromium } from "playwright-core";
 import { NextResponse } from "next/server";
+import * as cheerio from "cheerio";
 
 export async function GET() {
-	let browser;
 	try {
-		browser = await chromium.launch({
-			args: ["--no-sandbox", "--disable-setuid-sandbox"],
-			headless: true,
-		});
-		const page = await browser.newPage();
+		const response = await fetch("https://www.dolaronline.cl/");
+		const html = await response.text();
+		const $ = cheerio.load(html);
 
-		await page.goto("https://www.dolaronline.cl/", {
-			waitUntil: "networkidle",
-		});
-		const usdValue = await page
-			.locator('//*[@id="vlr-cambios"]/div/span[4]')
-			.textContent();
+		const usdValue = $("#vlr-cambios div span:nth-child(4)").text();
 
 		const cleanValue = usdValue
 			? parseFloat(usdValue.replace("$", "").replace(".", "").replace(",", "."))
 			: 0;
 
-		await browser.close();
 		return NextResponse.json({ rate: cleanValue });
 	} catch (error) {
 		console.error("Error fetching USD rate:", error);
-		if (browser) await browser.close();
 		return NextResponse.json({ rate: 0 }, { status: 200 });
 	}
 }

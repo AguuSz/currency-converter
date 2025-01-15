@@ -1,27 +1,19 @@
-import { chromium } from "playwright-core";
 import { Handler } from "@netlify/functions";
+import * as cheerio from "cheerio";
 
 export const handler: Handler = async (event) => {
 	const path = event.path.replace("/.netlify/functions/api/", "");
-	let browser;
 
 	try {
-		browser = await chromium.launch({
-			args: ["--no-sandbox", "--disable-setuid-sandbox"],
-			headless: true,
-		});
-
-		const page = await browser.newPage();
 		let rate = 0;
+		let response;
+		let $;
 
 		switch (path) {
 			case "usd-rate":
-				await page.goto("https://www.dolaronline.cl/", {
-					waitUntil: "networkidle",
-				});
-				const usdValue = await page
-					.locator('//*[@id="vlr-cambios"]/div/span[4]')
-					.textContent();
+				response = await fetch("https://www.dolaronline.cl/");
+				$ = cheerio.load(await response.text());
+				const usdValue = $("#vlr-cambios div span:nth-child(4)").text();
 				rate = usdValue
 					? parseFloat(
 							usdValue.replace("$", "").replace(".", "").replace(",", ".")
@@ -30,13 +22,13 @@ export const handler: Handler = async (event) => {
 				break;
 
 			case "ars-rate":
-				await page.goto(
-					"https://www.cronista.com/MercadosOnline/moneda.html?id=ARSMEP",
-					{ waitUntil: "networkidle" }
+				response = await fetch(
+					"https://www.cronista.com/MercadosOnline/moneda.html?id=ARSMEP"
 				);
-				const arsValue = await page
-					.locator('//*[@id="market-scrll-1"]/li/a/span[4]/div[2]')
-					.textContent();
+				$ = cheerio.load(await response.text());
+				const arsValue = $(
+					"#market-scrll-1 li a span:nth-child(4) div:nth-child(2)"
+				).text();
 				rate = arsValue
 					? parseFloat(
 							arsValue.replace("$", "").replace(".", "").replace(",", ".")
@@ -45,13 +37,13 @@ export const handler: Handler = async (event) => {
 				break;
 
 			case "ars-tarjeta-rate":
-				await page.goto(
-					"https://www.cronista.com/MercadosOnline/moneda.html?id=ARSTAR",
-					{ waitUntil: "networkidle" }
+				response = await fetch(
+					"https://www.cronista.com/MercadosOnline/moneda.html?id=ARSTAR"
 				);
-				const arsTarjetaValue = await page
-					.locator('//*[@id="market-scrll-1"]/li/a/span[5]/div[2]')
-					.textContent();
+				$ = cheerio.load(await response.text());
+				const arsTarjetaValue = $(
+					"#market-scrll-1 li a span:nth-child(5) div:nth-child(2)"
+				).text();
 				rate = arsTarjetaValue
 					? parseFloat(
 							arsTarjetaValue
@@ -63,14 +55,12 @@ export const handler: Handler = async (event) => {
 				break;
 		}
 
-		await browser.close();
 		return {
 			statusCode: 200,
 			body: JSON.stringify({ rate }),
 		};
 	} catch (error) {
 		console.error(`Error fetching ${path}:`, error);
-		if (browser) await browser.close();
 		return {
 			statusCode: 200,
 			body: JSON.stringify({ rate: 0 }),
