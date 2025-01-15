@@ -1,6 +1,7 @@
 import { chromium } from "playwright-core";
+import { Handler } from "@netlify/functions";
 
-export async function handler(event) {
+export const handler: Handler = async (event) => {
 	const path = event.path.replace("/.netlify/functions/api/", "");
 	let browser;
 
@@ -75,4 +76,4 @@ export async function handler(event) {
 			body: JSON.stringify({ rate: 0 }),
 		};
 	}
-}
+};

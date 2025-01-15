@@ -22,7 +22,8 @@
 		"react-dom": "^19.0.0",
 		"tailwind-merge": "^2.6.0",
 		"tailwindcss-animate": "^1.0.7",
-		"playwright-core": "^1.41.2"
+		"playwright-core": "^1.41.2",
+		"@netlify/functions": "^2.0.0"
 	},
 	"devDependencies": {
 		"@eslint/eslintrc": "^3",
