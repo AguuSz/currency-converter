@@ -1,8 +1,13 @@
-import { getCachedValue, setCachedValue, isValidCache } from "./cache";
+import {
+	getCachedValue,
+	setCachedValue,
+	isValidCache,
+	CacheData,
+} from "./cache";
 
 export async function getARSRate() {
 	const CACHE_KEY = "ars_rate";
-	const cached = getCachedValue(CACHE_KEY);
+	const cached = getCachedValue(CACHE_KEY) as CacheData | null;
 
 	if (isValidCache(cached)) {
 		return { rate: cached.value, timestamp: cached.timestamp };
@@ -17,15 +22,15 @@ export async function getARSRate() {
 	} catch (error) {
 		console.error("Error fetching ARS rate:", error);
 		return {
-			rate: cached?.value || 0,
-			timestamp: cached?.timestamp || Date.now(),
+			rate: 0,
+			timestamp: Date.now(),
 		};
 	}
 }
 
 export async function getUSDRate() {
 	const CACHE_KEY = "usd_rate";
-	const cached = getCachedValue(CACHE_KEY);
+	const cached = getCachedValue(CACHE_KEY) as CacheData | null;
 
 	if (isValidCache(cached)) {
 		return cached.value;
@@ -38,13 +43,13 @@ export async function getUSDRate() {
 		return data.rate;
 	} catch (error) {
 		console.error("Error fetching USD rate:", error);
-		return cached?.value || 0;
+		return 0;
 	}
 }
 
 export async function getARSTarjetaRate() {
 	const CACHE_KEY = "ars_tarjeta_rate";
-	const cached = getCachedValue(CACHE_KEY);
+	const cached = getCachedValue(CACHE_KEY) as CacheData | null;
 
 	if (isValidCache(cached)) {
 		return cached.value;
@@ -57,6 +62,6 @@ export async function getARSTarjetaRate() {
 		return data.rate;
 	} catch (error) {
 		console.error("Error fetching ARS Tarjeta rate:", error);
-		return cached?.value || 0;
+		return 0;
 	}
 }

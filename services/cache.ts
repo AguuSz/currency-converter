@@ -1,4 +1,4 @@
-interface CacheData {
+export interface CacheData {
 	value: number;
 	timestamp: number;
 }
